@@ -92,7 +92,6 @@ const EditBook = () => {
         <Spinner />
       ) : (
         <div>
-          <img src={image} alt="Book cover" className="my-4" /> {/* Render the image */}
           <button onClick={handleEditBook} className='bg-blue-500 text-white p-2 rounded'> Save </button>
         </div>
       )}

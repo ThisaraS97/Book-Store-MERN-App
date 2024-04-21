@@ -47,12 +47,6 @@ const ShowBook = () => {
           <div className='my-4'>
             <span className='text-xl mr-4 text-gray-500'>Publish Year</span> {book.publishYear}
           </div>
-          <div className='my-4'>
-            <span className='text-xl mr-4 text-gray-500'>Image</span> 
-            {book.image && book.image.data && book.image.contentType && (
-              <img src={`data:${book.image.contentType};base64,${book.image.data}`} alt="Book" />
-            )}
-          </div>
           <button onClick={handlePrint} className='bg-green-500 text-white p-2 rounded-md my-2'>
             Print
           </button>

@@ -1,7 +1,6 @@
 import express from 'express';
 import { Book } from '../models/bookmodel.js'; 
 import multer from 'multer';
-import fs from 'fs';
 
 const router = express.Router();
 
@@ -20,10 +19,6 @@ router.post('/', upload.fields([{name: 'image', maxcount: 1 }, {name: 'pdfVersio
             return res.status(400).send('All fields are required');
         }
 
-       //Extracting the file from the request
-       const image = req.files['image'][0];
-       const pdfVersion = req.files['pdfVersion'][0];
-
         const newBook ={
             title: req.body.title,
             author: req.body.author,  
@@ -31,21 +26,6 @@ router.post('/', upload.fields([{name: 'image', maxcount: 1 }, {name: 'pdfVersio
             publisher: req.body.publisher,
         };
 
-        const imagePromise = fs.promises.readFile(image.path);
-        const pdfVersionPromise = fs.promises.readFile(pdfVersion.path);
-
-        const [imageData, pdfData] = await Promise.all([imagePromise, pdfVersionPromise]);
-
-         // Update newBook object with file data
-         newBook.image = {
-            data: imageData,
-            contentType: image.mimetype
-        };
-        newBook.pdfVersion = {
-            data: pdfData,   
-            contentType: pdfVersion.mimetype
-        };
-        
         const book = await Book.create(newBook);
         console.log(book);
 
