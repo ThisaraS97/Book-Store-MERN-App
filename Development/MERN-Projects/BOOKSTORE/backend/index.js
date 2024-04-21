@@ -7,6 +7,8 @@ import cors from 'cors';
 
 const app = express();
 
+app.use(cors());
+
 /*app.use(
     cors({
         origin: 'http://localhost:3000',
@@ -19,9 +21,9 @@ const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send('Hello World!!');
+    res.send('Hello World!');
     console.log(request);
-    return response.status(234).send('Hello World!!');
+    return response.status(234).send('Hello World!');
 });
 
 app.use('/book', bookRoute);

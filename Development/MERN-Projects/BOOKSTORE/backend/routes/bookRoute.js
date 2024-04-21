@@ -1,10 +1,16 @@
 import express from 'express';
 import { Book } from '../models/bookmodel.js'; 
+import multer from 'multer';
+import fs from 'fs';
 
 const router = express.Router();
 
+// Set up multer for file uploads
+const upload = multer({ dest: 'uploads/' });    // Set the destination folder for uploaded files
+
+
 //Route for Saving a new Book
-router.post('/', async (req, res) => {
+router.post('/', upload.fields([{name: 'image', maxcount: 1 }, {name: 'pdfVersion', maxCount: 1 }]), async (req, res) => {
     try {
         if (!req.body.title || 
             !req.body.author || 
@@ -13,12 +19,33 @@ router.post('/', async (req, res) => {
             {
             return res.status(400).send('All fields are required');
         }
+
+       //Extracting the file from the request
+       const image = req.files['image'][0];
+       const pdfVersion = req.files['pdfVersion'][0];
+
         const newBook ={
             title: req.body.title,
             author: req.body.author,  
-            publishYear: req.body.publishYear,
-            publisher: req.body.publisher
+            publishYear: new Date(req.body.publishYear).getFullYear(),
+            publisher: req.body.publisher,
         };
+
+        const imagePromise = fs.promises.readFile(image.path);
+        const pdfVersionPromise = fs.promises.readFile(pdfVersion.path);
+
+        const [imageData, pdfData] = await Promise.all([imagePromise, pdfVersionPromise]);
+
+         // Update newBook object with file data
+         newBook.image = {
+            data: imageData,
+            contentType: image.mimetype
+        };
+        newBook.pdfVersion = {
+            data: pdfData,   
+            contentType: pdfVersion.mimetype
+        };
+        
         const book = await Book.create(newBook);
         console.log(book);
 
@@ -27,16 +54,26 @@ router.post('/', async (req, res) => {
     
     catch (error) {
         console.log(error.message);
-        response.status(500).send('Internal Server Error');
+        res.status(500).send('Internal Server Error');
     }
 });
 
 //Route for Getting all Books
 router.get('/', async (req, res) => {
     try {
-        const books = await Book.find();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const books = await Book.find().skip(skip).limit(limit);
+        console.log(books);
+
+        const totalBooksCount = await Book.countDocuments();
+
         return res.status(200).send({
             count: books.length,
+            totalBooks: totalBooksCount,
+            totalPages: Math.ceil(totalBooksCount / limit), 
             data: books
         });
     } catch (error) {
@@ -54,9 +91,11 @@ router.get('/:id', async (req, res) => {
         if (!book) {
             return res.status(404).send('Book not found');
         }
+
+        
         return res.status(200).send({
             count: book.length,
-            data: book
+            data: book,
         });
     } catch (error) {
         console.log(error.message);
