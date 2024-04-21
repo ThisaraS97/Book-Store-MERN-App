@@ -65,7 +65,6 @@ const Home = () => {
                 <th className="border border-slate-600 rounded-md">Title</th>
                 <th className="border border-slate-600 rounded-md max-md:hidden">Author</th>
                 <th className="border border-slate-600 rounded-md max-md:hidden">Publish Year</th>
-                <th className="border border-slate-600 rounded-md max-md:hidden">Publisher</th>
                 <th className="border border-slate-600 rounded-md">Operations</th>
               </tr>
             </thead>
@@ -76,7 +75,6 @@ const Home = () => {
                   <td className="border border-slate-600 rounded-md text-center">{book.title}</td>
                   <td className="border border-slate-600 rounded-md max-md:hidden">{book.author}</td>
                   <td className="border border-slate-600 rounded-md max-md:hidden">{book.publishYear}</td>
-                  <td className="border border-slate-600 rounded-md max-md:hidden">{book.publisher}</td>
                   <td className="border border-slate-600 rounded-md">
                     <Link to={`book/details/${book._id}`}>
                       <BsInfoCircle className="text-2xl text-green-800" />
@@ -101,6 +99,8 @@ const Home = () => {
             >
               Previous
             </button>
+              {/* Page numbering */}
+              <p className="text-lg">{`Page ${currentPage} of ${totalPages}`}</p>
             {/* Next button */}
             <button
               onClick={nextPage}
